@@ -326,7 +326,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     #left-panel > div:nth-child(3){display:none !important;}
     #left-panel > div:nth-child(4){display:none !important;}
     #left-panel > div:nth-child(5){display:none !important;}
-    #search{display:none !important;}
+    #search{
+  display:block !important;
+  position:fixed !important;
+  top:70px !important;
+  left:50% !important;
+  transform:translateX(-50%) !important;
+  width:calc(100vw - 24px) !important;
+  z-index:20 !important;
+}
     #c-jump-float{width:auto !important;padding:7px 18px !important;font-size:.68rem !important;white-space:nowrap !important;}
     #left-panel > div:last-child{width:auto !important;margin-top:0 !important;gap:5px !important;}
     #left-panel > div:last-child a{width:30px !important;height:30px !important;}
@@ -2350,8 +2358,7 @@ async function openPanel(node){
     const jwUrl=`https://www.justwatch.com/es/buscar?q=${q}`;
     document.getElementById('bnf').href=f.justwatch||jwUrl;
     // Blu-ray / 4K — filtra por departamento DVD+Blu-ray, añade año para evitar remakes
-    const yearSuffix = f.y ? `+${f.y}` : '';
-    const blurayUrl = f.amazon || `https://www.amazon.es/s?k=${q}+4K+Blu-ray${yearSuffix}&i=dvd&language=es_ES&tag=nexostreamtv-21`;
+    const blurayUrl = f.amazon || `https://www.amazon.es/s?k=${q}+Blu-ray&i=dvd&language=es_ES&tag=nexostreamtv-21`;
     document.getElementById('bamz').href = blurayUrl;
     // Merchandising — términos concretos que la gente realmente busca en Amazon
     // Titles with rich action figure ecosystems get toys department filter
