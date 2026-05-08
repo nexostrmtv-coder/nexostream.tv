@@ -2837,6 +2837,7 @@ function stopBso(){
 }
 
 window.addEventListener('popstate', (e) => {
+  e.preventDefault();
   if(navHistory.length > 1){
     navFuture.push(navHistory.pop());
     const prev = navHistory[navHistory.length-1];
@@ -2846,6 +2847,7 @@ window.addEventListener('popstate', (e) => {
       revealFilmsFor(prev);
       animTarget={x:W/2-prev.x*ts, y:H/2-prev.y*ts};
       openPanel(prev);
+      history.pushState({nodeId: prev.id}, '', '');
     }
     updateHistoryBtns();
   } else {
@@ -2854,6 +2856,7 @@ window.addEventListener('popstate', (e) => {
     revealed.clear(); updateCounter();
     document.getElementById('reveal-hint').classList.remove('hide');
     navHistory=[]; navFuture=[]; updateHistoryBtns();
+    history.pushState({}, '', '');
   }
 });
 
