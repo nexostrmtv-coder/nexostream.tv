@@ -2150,6 +2150,7 @@ function selectNode(n){
   const targetScale=Math.max(ts,1.8);
   animTarget={x:W/2-n.x*targetScale,y:H/2-n.y*targetScale,s:targetScale};
   pushHistory(n);
+  history.pushState({nodeId: n.id}, '', '');
   openPanel(n);
   document.getElementById('reveal-hint').classList.add('hide');
   if(n.type==='film'&&n.film) searchAndPlayBso(n.film.t);
@@ -2833,6 +2834,27 @@ function stopBso(){
   const info=document.getElementById('bso-info');
   if(info) info.style.display='none';
 }
+
+window.addEventListener('popstate', (e) => {
+  if(navHistory.length > 1){
+    navFuture.push(navHistory.pop());
+    const prev = navHistory[navHistory.length-1];
+    if(prev){
+      selected=prev; neighbors.clear();
+      edges.forEach(e=>{if(e.a===prev.id)neighbors.add(e.b);if(e.b===prev.id)neighbors.add(e.a);});
+      revealFilmsFor(prev);
+      animTarget={x:W/2-prev.x*ts, y:H/2-prev.y*ts};
+      openPanel(prev);
+    }
+    updateHistoryBtns();
+  } else {
+    selected=null; neighbors.clear(); closePanel(); stopBso();
+    nodes.forEach(n=>{if(n.type==='film')n.targetAlpha=n.film?.star?1:0;});
+    revealed.clear(); updateCounter();
+    document.getElementById('reveal-hint').classList.remove('hide');
+    navHistory=[]; navFuture=[]; updateHistoryBtns();
+  }
+});
 
 init();
 </script>
