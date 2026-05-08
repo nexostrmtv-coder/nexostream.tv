@@ -2669,7 +2669,8 @@ function selectNodeMobile(n){
   revealFilmsFor(n);
   const targetScale=Math.max(ts,1.8);
   animTarget={x:W/2-n.x*targetScale, y:H/2-n.y*targetScale, s:targetScale};
-  pushHistory(n);
+    pushHistory(n);
+  history.pushState({nodeId: n.id}, '', '');
   document.getElementById('reveal-hint').classList.add('hide');
   mobileToast.show();
 }
