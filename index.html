@@ -2308,7 +2308,10 @@ document.getElementById('search').addEventListener('input',function(){
     if(f.palabras&&f.palabras.some(p=>p.toLowerCase().includes(q))) return true;
     return false;
   });
-  if(n)selectNode(n);
+  if(n){
+    if(n.alpha<0.05){n.alpha=0.01;n.targetAlpha=1;}
+    selectNode(n);
+  }
 });
 
 // ── PANEL ──
