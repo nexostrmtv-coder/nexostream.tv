@@ -2294,7 +2294,20 @@ document.getElementById('jump-shuffle').onclick=()=>{jumpIdx++;showJump();};
 document.getElementById('jump-modal').onclick=(e)=>{if(e.target===e.currentTarget)closeJump();};
 document.getElementById('search').addEventListener('input',function(){
   const q=this.value.toLowerCase().trim();if(!q)return;
-  const n=nodes.find(n=>n.label.toLowerCase().includes(q));
+  const n=nodes.find(n=>{
+    if(n.label.toLowerCase().includes(q)) return true;
+    const f=n.film;
+    if(!f) return false;
+    if(f.dir&&f.dir.toLowerCase().includes(q)) return true;
+    if(f.y&&String(f.y).includes(q)) return true;
+    if(f.plataforma&&f.plataforma.toLowerCase().includes(q)) return true;
+    if(f.genres&&f.genres.some(g=>GENRES.find(gd=>gd.id===g)?.n.toLowerCase().includes(q))) return true;
+    if(f.clusters&&f.clusters.some(c=>c.toLowerCase().includes(q))) return true;
+    if(f.mitos&&f.mitos.some(m=>m.toLowerCase().includes(q))) return true;
+    if(f.temas&&f.temas.some(t=>t.toLowerCase().includes(q))) return true;
+    if(f.palabras&&f.palabras.some(p=>p.toLowerCase().includes(q))) return true;
+    return false;
+  });
   if(n)selectNode(n);
 });
 
