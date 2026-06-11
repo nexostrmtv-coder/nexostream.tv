@@ -326,6 +326,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     #left-panel > div:nth-child(3){display:none !important;}
     #left-panel > div:nth-child(4){display:none !important;}
     #left-panel > div:nth-child(5){display:none !important;}
+    #genre-chips-wrap{display:none !important;}
+    #genre-chips-sep{display:none !important;}
     #search{
   display:block !important;
   position:fixed !important;
@@ -469,11 +471,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
   <div style="width:170px;height:1px;background:rgba(255,255,255,.15);margin:4px 0;"></div>
   <!-- Genre chips -->
-  <div style="width:170px;">
+  <div id="genre-chips-wrap" style="width:170px;">
     <div style="font-family:'Bebas Neue';font-size:.75rem;letter-spacing:.12em;color:rgba(255,255,255,.45);margin-bottom:5px;text-transform:uppercase;">Explorar por género</div>
     <div id="genre-chips" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
   </div>
-  <div style="width:170px;height:1px;background:rgba(255,255,255,.1);margin:4px 0;"></div>
+  <div id="genre-chips-sep" style="width:170px;height:1px;background:rgba(255,255,255,.1);margin:4px 0;"></div>
   <button id="c-jump-float" title="Tres títulos, un nexo inesperado">
     <span style="font-size:1rem">✦</span>
     <span>NeXo<br>Inesperado</span>
