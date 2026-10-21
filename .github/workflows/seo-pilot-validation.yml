@@ -1,0 +1,151 @@
+name: SEO pilot validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "peliculas/**"
+      - "series/**"
+      - "sitemap.xml"
+      - ".github/workflows/seo-pilot-validation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-seo-pilot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out pull request
+        uses: actions/checkout@v4
+
+      - name: Validate SEO pages, structured data, links and sitemap
+        run: |
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          from urllib.parse import urlparse
+          import json
+          import xml.etree.ElementTree as ET
+          import sys
+
+          ROOT = Path(".")
+          BASE = "https://nexostream.tv"
+          expected = [
+              "peliculas/the-matrix/index.html",
+              "peliculas/alien/index.html",
+              "peliculas/star-wars/index.html",
+              "peliculas/blade-runner/index.html",
+              "peliculas/dark-city/index.html",
+              "peliculas/inception/index.html",
+              "series/stranger-things/index.html",
+              "series/game-of-thrones/index.html",
+              "series/the-last-of-us/index.html",
+              "series/breaking-bad/index.html",
+          ]
+
+          class PageParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.canonical = []
+                  self.og_image = []
+                  self.titles = []
+                  self.descriptions = []
+                  self.jsonld = []
+                  self.links = []
+                  self.in_title = False
+                  self.title_text = []
+                  self.in_jsonld = False
+                  self.jsonld_text = []
+              def handle_starttag(self, tag, attrs):
+                  a = dict(attrs)
+                  if tag == "title":
+                      self.in_title = True
+                  if tag == "link" and a.get("rel", "").lower() == "canonical":
+                      self.canonical.append(a.get("href", ""))
+                  if tag == "meta" and a.get("property") == "og:image":
+                      self.og_image.append(a.get("content", ""))
+                  if tag == "meta" and a.get("name") == "description":
+                      self.descriptions.append(a.get("content", ""))
+                  if tag == "a" and a.get("href"):
+                      self.links.append(a["href"])
+                  if tag == "script" and a.get("type") == "application/ld+json":
+                      self.in_jsonld = True
+                      self.jsonld_text = []
+              def handle_endtag(self, tag):
+                  if tag == "title":
+                      self.in_title = False
+                  if tag == "script" and self.in_jsonld:
+                      self.jsonld.append("".join(self.jsonld_text))
+                      self.in_jsonld = False
+              def handle_data(self, data):
+                  if self.in_title:
+                      self.title_text.append(data)
+                  if self.in_jsonld:
+                      self.jsonld_text.append(data)
+
+          errors = []
+          known_urls = {BASE + "/"}
+          for item in expected:
+              route = "/" + item.rsplit("/index.html", 1)[0] + "/"
+              known_urls.add(BASE + route)
+
+          for rel in expected:
+              path = ROOT / rel
+              if not path.is_file():
+                  errors.append(f"Missing page: {rel}")
+                  continue
+              parser = PageParser()
+              parser.feed(path.read_text(encoding="utf-8"))
+              route = "/" + rel.rsplit("/index.html", 1)[0] + "/"
+              canonical = BASE + route
+              if parser.canonical != [canonical]:
+                  errors.append(f"{rel}: expected exactly one self-referencing canonical {canonical}; got {parser.canonical}")
+              if len(parser.og_image) != 1 or not parser.og_image[0].startswith("https://"):
+                  errors.append(f"{rel}: missing or invalid og:image")
+              if len(parser.descriptions) != 1 or not parser.descriptions[0].strip():
+                  errors.append(f"{rel}: missing/duplicate meta description")
+              if not "".join(parser.title_text).strip():
+                  errors.append(f"{rel}: missing title")
+              if len(parser.jsonld) != 1:
+                  errors.append(f"{rel}: expected one JSON-LD block")
+              else:
+                  try:
+                      data = json.loads(parser.jsonld[0])
+                      if data.get("@type") not in ("Movie", "TVSeries"):
+                          errors.append(f"{rel}: unexpected JSON-LD @type {data.get('@type')}")
+                      if data.get("url") != canonical:
+                          errors.append(f"{rel}: JSON-LD URL does not match canonical")
+                  except Exception as exc:
+                      errors.append(f"{rel}: invalid JSON-LD: {exc}")
+              for href in parser.links:
+                  if href.startswith("/") and not href.startswith("//"):
+                      if href == "/":
+                          continue
+                      target = (ROOT / href.lstrip("/"))
+                      if target.is_dir():
+                          target = target / "index.html"
+                      if not target.is_file():
+                          errors.append(f"{rel}: broken internal link {href}")
+
+          sitemap = ROOT / "sitemap.xml"
+          try:
+              tree = ET.parse(sitemap)
+              ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+              urls = [el.text for el in tree.findall(".//sm:loc", ns)]
+              missing = known_urls - set(urls)
+              if missing:
+                  errors.append("Sitemap missing URLs: " + ", ".join(sorted(missing)))
+              if len(urls) != len(set(urls)):
+                  errors.append("Sitemap contains duplicate URLs")
+          except Exception as exc:
+              errors.append(f"Invalid sitemap.xml: {exc}")
+
+          if errors:
+              print("SEO pilot validation FAILED:")
+              for error in errors:
+                  print(" - " + error)
+              sys.exit(1)
+          print(f"SEO pilot validation passed: {len(expected)} pages, canonical tags, metadata, JSON-LD, internal links and sitemap.")
+          PY
