@@ -25,21 +25,27 @@ Series:
 - Static `index.html` pages under `/peliculas/<slug>/` and `/series/<slug>/`.
 - Unique title and meta description per page.
 - Self-referencing canonical URL.
-- Open Graph metadata.
+- Open Graph metadata, including the same catalogue poster used by the main site.
+- Responsive poster next to each title and synopsis, using the exact poster URL from the catalogue.
 - Schema.org `Movie` or `TVSeries` JSON-LD.
 - Contextual internal links between pages in this pilot.
 - Sitemap includes the homepage and the ten pilot URLs.
 
-## Important validation before production
+## Validation status
 
-This is a review branch; nothing here has been merged into `main` or verified on the production host.
+This is still a review branch; nothing here has been merged into `main` or deployed to production.
 
-Before merging:
-1. Confirm the actual hosting/deployment serves nested directories and their `index.html` files at the proposed clean URLs.
-2. Test all ten URLs on the preview/deployment environment, including canonical tags and JSON-LD.
-3. Check internal links for 404s and validate sitemap XML.
-4. Review factual descriptions and connections against the catalogue before indexing.
-5. Once deployed, submit the updated sitemap in Google Search Console and monitor indexing.
+Checks completed against the branch source:
+- All ten pages have a unique canonical URL, a poster image and matching `og:image`.
+- All ten JSON-LD blocks parse as valid JSON.
+- All internal links point to one of the ten pilot pages or the homepage; no duplicate links remain.
+- The sitemap is valid XML and contains the homepage plus the ten pilot URLs.
+
+Still required before merging:
+1. Deploy a preview and confirm the actual host serves nested directories and `index.html` at the clean URLs.
+2. Test all ten routes in that preview, including mobile layout, image loading, canonical tags and structured data.
+3. Review factual descriptions and connections editorially before indexing.
+4. After deployment, submit the updated sitemap in Google Search Console and monitor indexing.
 
 ## Editorial note
 
