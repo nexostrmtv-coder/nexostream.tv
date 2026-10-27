@@ -123,16 +123,16 @@ jobs:
 
           errors = []
           catalogue = (ROOT / "index.html").read_text(encoding="utf-8")
-          record_starts = list(re.finditer(r"\\{id:'([^']+)',t:\"([^\"]+)\",y:(\\d+),tipo:'([^']+)'", catalogue))
+          record_starts = list(re.finditer(r"\{id:'([^']+)',t:\"([^\"]+)\",y:(\d+),tipo:'([^']+)'", catalogue))
           catalog_records = {}
           def extract_array(block, field):
-              match = re.search(field + r":\\[([^\\]]*)\\]", block)
+              match = re.search(field + r":\[([^\]]*)\]", block)
               if not match:
                   return []
               try:
                   return json.loads("[" + match.group(1) + "]")
               except Exception:
-                  return re.findall(r'\"((?:\\\\.|[^\"\\\\])*)\"', match.group(1))
+                  return []
           for i, match in enumerate(record_starts):
               end = record_starts[i+1].start() if i+1 < len(record_starts) else len(catalogue)
               block = catalogue[match.start():end]
