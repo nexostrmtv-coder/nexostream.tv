@@ -4,6 +4,7 @@ on:
   pull_request:
     branches: [main]
     paths:
+      - "index.html"
       - "peliculas/**"
       - "series/**"
       - "sitemap.xml"
@@ -19,29 +20,34 @@ jobs:
     steps:
       - name: Check out pull request
         uses: actions/checkout@v4
-
-      - name: Validate SEO pages, structured data, links and sitemap
+      - name: Validate approved SEO pages against the catalogue
         run: |
           python3 - <<'PY'
           from html.parser import HTMLParser
           from pathlib import Path
-          from urllib.parse import urlparse
+          import html
           import json
-          import xml.etree.ElementTree as ET
+          import re
           import sys
+          import xml.etree.ElementTree as ET
 
           ROOT = Path(".")
           BASE = "https://nexostream.tv"
-          expected = [
-              "peliculas/the-matrix/index.html",
-              "peliculas/alien/index.html",
-              "peliculas/star-wars/index.html",
-              "peliculas/blade-runner/index.html",
+          expected = {
+              "peliculas/star-wars/index.html": {"name": "Star Wars", "type": "Movie", "connections": ["The Lord of the Rings","Dune","Harry Potter and the Philosopher Stone"]},
+    "peliculas/interstellar/index.html": {"name": "Interstellar", "type": "Movie", "connections": ["Arrival","Doctor Who"]},
+    "peliculas/alien/index.html": {"name": "Alien", "type": "Movie", "connections": ["Jaws","The Thing"]},
+    "peliculas/blade-runner/index.html": {"name": "Blade Runner", "type": "Movie", "connections": ["Dark City","The Matrix","Westworld"]},
+    "peliculas/the-matrix/index.html": {"name": "The Matrix", "type": "Movie", "connections": ["Dark City","Tron","Westworld"]},
+    "peliculas/the-lord-of-the-rings/index.html": {"name": "The Lord of the Rings", "type": "Movie", "connections": ["Dune","Star Wars"]},
+    "series/game-of-thrones/index.html": {"name": "Game of Thrones", "type": "TVSeries", "connections": ["The Lord of the Rings: The Rings of Power","Peaky Blinders","Sons of Anarchy"]},
+    "series/stranger-things/index.html": {"name": "Stranger Things", "type": "TVSeries", "connections": ["The Goonies","From","The Leftovers"]},
+    "series/one-piece/index.html": {"name": "One Piece", "type": "TVSeries", "connections": ["The Mandalorian","Pirates of the Caribbean: The Curse of the Black Pearl","The Goonies"]},
+    "series/the-last-of-us/index.html": {"name": "The Last of Us", "type": "TVSeries", "connections": ["The Walking Dead","Children of men","Mad Max 2"]},
+          }
+          obsolete = [
               "peliculas/dark-city/index.html",
               "peliculas/inception/index.html",
-              "series/stranger-things/index.html",
-              "series/game-of-thrones/index.html",
-              "series/the-last-of-us/index.html",
               "series/breaking-bad/index.html",
           ]
 
@@ -49,33 +55,61 @@ jobs:
               def __init__(self):
                   super().__init__()
                   self.canonical = []
+                  self.og_title = []
+                  self.og_url = []
                   self.og_image = []
-                  self.titles = []
                   self.descriptions = []
                   self.jsonld = []
                   self.links = []
-                  self.in_title = False
                   self.title_text = []
+                  self.in_title = False
                   self.in_jsonld = False
                   self.jsonld_text = []
+                  self.sections = set()
+                  self.catalog_title = []
+                  self.connections = []
+                  self.active_section = None
+                  self.in_li = False
+                  self.li_text = []
+                  self.section_values = {"mitos": [], "temas": [], "arquetipos": []}
               def handle_starttag(self, tag, attrs):
                   a = dict(attrs)
                   if tag == "title":
                       self.in_title = True
                   if tag == "link" and a.get("rel", "").lower() == "canonical":
                       self.canonical.append(a.get("href", ""))
-                  if tag == "meta" and a.get("property") == "og:image":
-                      self.og_image.append(a.get("content", ""))
                   if tag == "meta" and a.get("name") == "description":
                       self.descriptions.append(a.get("content", ""))
+                  if tag == "meta" and a.get("property") == "og:title":
+                      self.og_title.append(a.get("content", ""))
+                  if tag == "meta" and a.get("property") == "og:url":
+                      self.og_url.append(a.get("content", ""))
+                  if tag == "meta" and a.get("property") == "og:image":
+                      self.og_image.append(a.get("content", ""))
                   if tag == "a" and a.get("href"):
                       self.links.append(a["href"])
+                  if tag == "main" and a.get("data-catalog-title"):
+                      self.catalog_title.append(a["data-catalog-title"])
+                  if tag == "section":
+                      self.active_section = a.get("id")
+                      if self.active_section:
+                          self.sections.add(self.active_section)
+                  if tag == "li" and self.active_section in self.section_values:
+                      self.in_li = True
+                      self.li_text = []
+                  if tag == "article" and "connection" in a.get("class", "").split():
+                      self.connections.append(a.get("data-title", ""))
                   if tag == "script" and a.get("type") == "application/ld+json":
                       self.in_jsonld = True
                       self.jsonld_text = []
               def handle_endtag(self, tag):
                   if tag == "title":
                       self.in_title = False
+                  if tag == "li" and self.in_li and self.active_section in self.section_values:
+                      self.section_values[self.active_section].append("".join(self.li_text).strip())
+                      self.in_li = False
+                  if tag == "section":
+                      self.active_section = None
                   if tag == "script" and self.in_jsonld:
                       self.jsonld.append("".join(self.jsonld_text))
                       self.in_jsonld = False
@@ -84,68 +118,130 @@ jobs:
                       self.title_text.append(data)
                   if self.in_jsonld:
                       self.jsonld_text.append(data)
+                  if self.in_li:
+                      self.li_text.append(data)
 
           errors = []
-          known_urls = {BASE + "/"}
-          for item in expected:
-              route = "/" + item.rsplit("/index.html", 1)[0] + "/"
-              known_urls.add(BASE + route)
+          catalogue = (ROOT / "index.html").read_text(encoding="utf-8")
+          record_starts = list(re.finditer(r"\\{id:'([^']+)',t:\"([^\"]+)\",y:(\\d+),tipo:'([^']+)'", catalogue))
+          catalog_records = {}
+          def extract_array(block, field):
+              match = re.search(field + r":\\[([^\\]]*)\\]", block)
+              if not match:
+                  return []
+              try:
+                  return json.loads("[" + match.group(1) + "]")
+              except Exception:
+                  return re.findall(r'\"((?:\\\\.|[^\"\\\\])*)\"', match.group(1))
+          for i, match in enumerate(record_starts):
+              end = record_starts[i+1].start() if i+1 < len(record_starts) else len(catalogue)
+              block = catalogue[match.start():end]
+              catalog_records[match.group(2)] = {
+                  "mitos": extract_array(block, "mitos"),
+                  "temas": extract_array(block, "temas"),
+                  "arquetipos": extract_array(block, "personajes"),
+              }
 
-          for rel in expected:
+          urls = {BASE + "/"}
+          route_paths = set()
+          seen_titles = set()
+          seen_descriptions = set()
+          for rel, spec in expected.items():
               path = ROOT / rel
+              route = "/" + rel.rsplit("/index.html", 1)[0] + "/"
+              canonical = BASE + route
+              urls.add(canonical)
+              route_paths.add(route)
               if not path.is_file():
                   errors.append(f"Missing page: {rel}")
                   continue
+              source = path.read_text(encoding="utf-8")
               parser = PageParser()
-              parser.feed(path.read_text(encoding="utf-8"))
-              route = "/" + rel.rsplit("/index.html", 1)[0] + "/"
-              canonical = BASE + route
+              parser.feed(source)
+              title = "".join(parser.title_text).strip()
+              description = parser.descriptions[0].strip() if len(parser.descriptions) == 1 else ""
               if parser.canonical != [canonical]:
-                  errors.append(f"{rel}: expected exactly one self-referencing canonical {canonical}; got {parser.canonical}")
+                  errors.append(f"{rel}: canonical missing, duplicated or incorrect: {parser.canonical}")
+              if parser.og_url != [canonical]:
+                  errors.append(f"{rel}: og:url does not match canonical")
               if len(parser.og_image) != 1 or not parser.og_image[0].startswith("https://"):
                   errors.append(f"{rel}: missing or invalid og:image")
-              if len(parser.descriptions) != 1 or not parser.descriptions[0].strip():
-                  errors.append(f"{rel}: missing/duplicate meta description")
-              if not "".join(parser.title_text).strip():
-                  errors.append(f"{rel}: missing title")
+              if len(parser.og_title) != 1 or parser.og_title[0] != title:
+                  errors.append(f"{rel}: og:title must match the unique document title")
+              if len(parser.descriptions) != 1 or not 100 <= len(description) <= 160:
+                  errors.append(f"{rel}: meta description must be unique and 100-160 characters")
+              if title in seen_titles:
+                  errors.append(f"{rel}: duplicate title tag")
+              seen_titles.add(title)
+              if description in seen_descriptions:
+                  errors.append(f"{rel}: duplicate meta description")
+              seen_descriptions.add(description)
+              if parser.catalog_title != [spec["name"]]:
+                  errors.append(f"{rel}: catalogue title mismatch: {parser.catalog_title}")
+              if spec["name"] not in title:
+                  errors.append(f"{rel}: title tag does not contain {spec['name']}")
+              if not {"mitos", "temas", "arquetipos", "conexiones"}.issubset(parser.sections):
+                  errors.append(f"{rel}: missing myths/themes/archetypes/connections section")
+              if parser.connections != spec["connections"]:
+                  errors.append(f"{rel}: approved connections mismatch; expected {spec['connections']}, got {parser.connections}")
+              record = catalog_records.get(spec["name"])
+              if record is None:
+                  errors.append(f"{rel}: title absent from index.html catalogue")
+              else:
+                  for field in ("mitos", "temas", "arquetipos"):
+                      actual = parser.section_values[field]
+                      if actual != record[field]:
+                          errors.append(f"{rel}: {field} differ from catalogue; expected {record[field]}, got {actual}")
               if len(parser.jsonld) != 1:
-                  errors.append(f"{rel}: expected one JSON-LD block")
+                  errors.append(f"{rel}: expected exactly one JSON-LD block")
               else:
                   try:
                       data = json.loads(parser.jsonld[0])
-                      if data.get("@type") not in ("Movie", "TVSeries"):
-                          errors.append(f"{rel}: unexpected JSON-LD @type {data.get('@type')}")
+                      if data.get("@type") != spec["type"] or data.get("name") != spec["name"]:
+                          errors.append(f"{rel}: JSON-LD type/name mismatch")
                       if data.get("url") != canonical:
-                          errors.append(f"{rel}: JSON-LD URL does not match canonical")
+                          errors.append(f"{rel}: JSON-LD URL mismatch")
+                      if data.get("image") != parser.og_image[0]:
+                          errors.append(f"{rel}: JSON-LD image and og:image differ")
                   except Exception as exc:
                       errors.append(f"{rel}: invalid JSON-LD: {exc}")
               for href in parser.links:
-                  if href.startswith("/") and not href.startswith("//"):
-                      if href == "/":
-                          continue
-                      target = (ROOT / href.lstrip("/"))
+                  if href.startswith("/") and not href.startswith("//") and href != "/":
+                      if href not in route_paths and href not in {"/" + p.rsplit("/index.html", 1)[0] + "/" for p in expected}:
+                          errors.append(f"{rel}: internal link is not one of the SEO pilot routes: {href}")
+                      target = ROOT / href.lstrip("/")
                       if target.is_dir():
                           target = target / "index.html"
                       if not target.is_file():
                           errors.append(f"{rel}: broken internal link {href}")
 
+          for rel in obsolete:
+              if (ROOT / rel).exists():
+                  errors.append(f"Obsolete page still present: {rel}")
+
           sitemap = ROOT / "sitemap.xml"
           try:
               tree = ET.parse(sitemap)
               ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
-              urls = [el.text for el in tree.findall(".//sm:loc", ns)]
-              missing = known_urls - set(urls)
-              if missing:
-                  errors.append("Sitemap missing URLs: " + ", ".join(sorted(missing)))
-              if len(urls) != len(set(urls)):
+              sitemap_urls = [node.text for node in tree.findall(".//sm:loc", ns)]
+              if set(sitemap_urls) != urls:
+                  errors.append("Sitemap URLs differ from the homepage plus the ten approved SEO pages")
+              if len(sitemap_urls) != len(set(sitemap_urls)):
                   errors.append("Sitemap contains duplicate URLs")
           except Exception as exc:
               errors.append(f"Invalid sitemap.xml: {exc}")
+
+          missing_connection_records = sorted({
+              connection for spec in expected.values() for connection in spec["connections"]
+              if connection not in catalog_records
+          })
+          if missing_connection_records:
+              errors.append("Connection titles missing from catalogue: " + ", ".join(missing_connection_records))
 
           if errors:
               print("SEO pilot validation FAILED:")
               for error in errors:
                   print(" - " + error)
               sys.exit(1)
-          print(f"SEO pilot validation passed: {len(expected)} pages, canonical tags, metadata, JSON-LD, internal links and sitemap.")
+          print(f"SEO pilot validation passed: {len(expected)} approved pages; exact catalogue myths/themes/archetypes; approved connections; canonical/OG/JSON-LD; internal links; sitemap.")
           PY
