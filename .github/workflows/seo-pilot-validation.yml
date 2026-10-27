@@ -34,16 +34,16 @@ jobs:
           ROOT = Path(".")
           BASE = "https://nexostream.tv"
           expected = {
-              "peliculas/star-wars/index.html": {"name": "Star Wars", "type": "Movie", "connections": ["The Lord of the Rings","Dune","Harry Potter and the Philosopher Stone"]},
-    "peliculas/interstellar/index.html": {"name": "Interstellar", "type": "Movie", "connections": ["Arrival","Doctor Who"]},
-    "peliculas/alien/index.html": {"name": "Alien", "type": "Movie", "connections": ["Jaws","The Thing"]},
-    "peliculas/blade-runner/index.html": {"name": "Blade Runner", "type": "Movie", "connections": ["Dark City","The Matrix","Westworld"]},
-    "peliculas/the-matrix/index.html": {"name": "The Matrix", "type": "Movie", "connections": ["Dark City","Tron","Westworld"]},
-    "peliculas/the-lord-of-the-rings/index.html": {"name": "The Lord of the Rings", "type": "Movie", "connections": ["Dune","Star Wars"]},
-    "series/game-of-thrones/index.html": {"name": "Game of Thrones", "type": "TVSeries", "connections": ["The Lord of the Rings: The Rings of Power","Peaky Blinders","Sons of Anarchy"]},
-    "series/stranger-things/index.html": {"name": "Stranger Things", "type": "TVSeries", "connections": ["The Goonies","From","The Leftovers"]},
-    "series/one-piece/index.html": {"name": "One Piece", "type": "TVSeries", "connections": ["The Mandalorian","Pirates of the Caribbean: The Curse of the Black Pearl","The Goonies"]},
-    "series/the-last-of-us/index.html": {"name": "The Last of Us", "type": "TVSeries", "connections": ["The Walking Dead","Children of men","Mad Max 2"]},
+          "peliculas/star-wars/index.html": {"name": "Star Wars", "type": "Movie", "connections": ["The Lord of the Rings","Dune","Harry Potter and the Philosopher Stone"]},
+          "peliculas/interstellar/index.html": {"name": "Interstellar", "type": "Movie", "connections": ["Arrival","Doctor Who"]},
+          "peliculas/alien/index.html": {"name": "Alien", "type": "Movie", "connections": ["Jaws","The Thing"]},
+          "peliculas/blade-runner/index.html": {"name": "Blade Runner", "type": "Movie", "connections": ["Dark City","The Matrix","Westworld"]},
+          "peliculas/the-matrix/index.html": {"name": "The Matrix", "type": "Movie", "connections": ["Dark City","Tron","Westworld"]},
+          "peliculas/the-lord-of-the-rings/index.html": {"name": "The Lord of the Rings", "type": "Movie", "connections": ["Dune","Star Wars"]},
+          "series/game-of-thrones/index.html": {"name": "Game of Thrones", "type": "TVSeries", "connections": ["The Lord of the Rings: The Rings of Power","Peaky Blinders","Sons of Anarchy"]},
+          "series/stranger-things/index.html": {"name": "Stranger Things", "type": "TVSeries", "connections": ["The Goonies","From","The Leftovers"]},
+          "series/one-piece/index.html": {"name": "One Piece", "type": "TVSeries", "connections": ["The Mandalorian","Pirates of the Caribbean: The Curse of the Black Pearl","The Goonies"]},
+          "series/the-last-of-us/index.html": {"name": "The Last of Us", "type": "TVSeries", "connections": ["The Walking Dead","Children of men","Mad Max 2"]},
           }
           obsolete = [
               "peliculas/dark-city/index.html",
