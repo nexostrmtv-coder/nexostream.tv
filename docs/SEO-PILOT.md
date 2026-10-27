@@ -32,9 +32,11 @@ The two-connection pages (Interstellar, Alien and The Lord of the Rings) intenti
 - Sitemap contains only the homepage and the ten approved SEO routes.
 - GitHub Actions validation compares each page's myths, themes and archetypes directly with `index.html`, checks exact approved connections, JSON-LD, internal links and sitemap.
 
-## Deployment gate — not yet cleared
+## Deployment gate — identified, preview still required
 
-Nothing in this branch has been merged into `main` or published to production. The repository has a `CNAME` file but no deployment workflow on `main`; those facts alone do not prove which provider currently serves `nexostream.tv`. The connected Vercel account has no matching project and the connected Railway account lists only the separate Subastas Oportunidades project. The live hosting provider and production route behavior still need independent verification. Do not merge or publish until the active host or a genuine preview deployment is confirmed and all ten routes are tested there.
+Nothing in this branch has been merged into `main` or published to production. The active deployment mechanism is GitHub Pages: the repository has a `CNAME` file and GitHub Actions shows a successful `pages build and deployment` run on 19 October 2026, including the step `Deploy to GitHub Pages`. The PR validation now also runs the same GitHub Pages Jekyll builder and checks that all ten nested `index.html` route files exist in the generated `_site` output.
+
+The repository does not provide a public preview deployment for pull requests. The generated output can be checked in CI, but the ten new URLs cannot be HTTP-tested on the production domain until they are deployed. Do not merge or publish until a separate preview/staging URL is available and all ten clean routes, images, canonical tags and structured data have been checked there. After production publication, run a second smoke test against all ten live URLs.
 
 ## Catalogue data-quality note
 
