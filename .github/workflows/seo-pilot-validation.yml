@@ -245,3 +245,33 @@ jobs:
               sys.exit(1)
           print(f"SEO pilot validation passed: {len(expected)} approved pages; exact catalogue myths/themes/archetypes; approved connections; canonical/OG/JSON-LD; internal links; sitemap.")
           PY
+      - name: Build with the production GitHub Pages Jekyll builder
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./
+          destination: ./_site
+      - name: Verify clean URL files in the Pages build
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import sys
+          expected = [
+              "peliculas/star-wars/index.html",
+              "peliculas/interstellar/index.html",
+              "peliculas/alien/index.html",
+              "peliculas/blade-runner/index.html",
+              "peliculas/the-matrix/index.html",
+              "peliculas/the-lord-of-the-rings/index.html",
+              "series/game-of-thrones/index.html",
+              "series/stranger-things/index.html",
+              "series/one-piece/index.html",
+              "series/the-last-of-us/index.html",
+          ]
+          missing = [path for path in expected if not (Path("_site") / path).is_file()]
+          if missing:
+              print("GitHub Pages build missing SEO route files:")
+              for path in missing:
+                  print(" - " + path)
+              sys.exit(1)
+          print(f"GitHub Pages Jekyll build contains all {len(expected)} clean-URL route files.")
+          PY
