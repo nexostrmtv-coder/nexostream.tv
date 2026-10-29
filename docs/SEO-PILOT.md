@@ -27,7 +27,7 @@ The two-connection pages (Interstellar, Alien and The Lord of the Rings) intenti
 - Static `index.html` files under `/peliculas/<slug>/` and `/series/<slug>/`.
 - Unique title and meta description, canonical URL, Open Graph and Twitter metadata.
 - Schema.org `Movie` or `TVSeries` JSON-LD.
-- Responsive layout and poster URLs from the current catalogue.
+- Responsive layout and poster URLs from the current catalogue; the Star Wars SEO page uses a verified working TMDB poster URL because the registered catalogue URL did not load in the visual check.
 - Catalogue myths, themes and archetypes are rendered exactly as stored.
 - Sitemap contains only the homepage and the ten approved SEO routes.
 - GitHub Actions validation compares each page's myths, themes and archetypes directly with `index.html`, checks exact approved connections, JSON-LD, internal links and sitemap.
@@ -40,4 +40,4 @@ The repository does not provide a public preview deployment for pull requests. T
 
 ## Catalogue data-quality note
 
-The current catalogue record for `Star Wars` (1977) contains a synopsis referring to the First Order and Rey, which does not match that film's period and title. This pilot uses a corrected editorial synopsis but retains the poster URL registered in the catalogue. The catalogue record itself is not changed by this PR and the poster should be visually checked before production.
+The current catalogue record for `Star Wars` (1977) contains a synopsis referring to the First Order and Rey, which does not match that film's period and title. This pilot uses a corrected editorial synopsis and a verified working TMDB poster URL (`6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg`); the poster URL registered in the catalogue did not load in the visual check. The underlying catalogue record and homepage remain unchanged in this PR and should be corrected separately.
