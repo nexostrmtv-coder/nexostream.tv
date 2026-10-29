@@ -42,7 +42,7 @@ jobs:
           "peliculas/the-lord-of-the-rings/index.html": {"name": "The Lord of the Rings", "type": "Movie", "connections": ["Dune","Star Wars"]},
           "series/game-of-thrones/index.html": {"name": "Game of Thrones", "type": "TVSeries", "connections": ["The Lord of the Rings: The Rings of Power","Peaky Blinders","Sons of Anarchy"]},
           "series/stranger-things/index.html": {"name": "Stranger Things", "type": "TVSeries", "connections": ["The Goonies","From","The Leftovers"]},
-          "series/one-piece/index.html": {"name": "One Piece", "type": "TVSeries", "connections": ["The Mandalorian","Pirates of the Caribbean: The Curse of the Black Pearl","The Goonies"]},
+          "series/one-piece/index.html": {"name": "One Piece", "type": "TVSeries", "connections": ["The Mandalorian","Pirates of the Caribbean: The Curse of the Black Pearl","The Goonies"], "image": "https://dnm.nflximg.net/api/v6/a01MIaQTUgSJoLaS_OCn68Eg3hU/AAAAQS29ncokndfg0tj_-EG9OZxQPJzQ_L-v5_t7gFe8TXPgOLt2X-sfuWbPFDy-Q9KfDkCh0izLB6Z49kSGjeywrLwv0PTxZNJGcYMzRnex5ZrCG9TZv80mKFEaS757ekLOzdKluC_jTCusP2IqjETWNKg3.jpg?r=409"},
           "series/the-last-of-us/index.html": {"name": "The Last of Us", "type": "TVSeries", "connections": ["The Walking Dead","Children of men","Mad Max 2"]},
           }
           obsolete = [
