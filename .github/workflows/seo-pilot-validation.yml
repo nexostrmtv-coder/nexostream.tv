@@ -34,7 +34,7 @@ jobs:
           ROOT = Path(".")
           BASE = "https://nexostream.tv"
           expected = {
-          "peliculas/star-wars/index.html": {"name": "Star Wars", "type": "Movie", "connections": ["The Lord of the Rings","Dune","Harry Potter and the Philosopher Stone"]},
+          "peliculas/star-wars/index.html": {"name": "Star Wars", "type": "Movie", "connections": ["The Lord of the Rings","Dune","Harry Potter and the Philosopher Stone"], "image": "https://image.tmdb.org/t/p/w500/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg"},
           "peliculas/interstellar/index.html": {"name": "Interstellar", "type": "Movie", "connections": ["Arrival","Doctor Who"]},
           "peliculas/alien/index.html": {"name": "Alien", "type": "Movie", "connections": ["Jaws","The Thing"]},
           "peliculas/blade-runner/index.html": {"name": "Blade Runner", "type": "Movie", "connections": ["Dark City","The Matrix","Westworld"]},
@@ -166,6 +166,8 @@ jobs:
                   errors.append(f"{rel}: og:url does not match canonical")
               if len(parser.og_image) != 1 or not parser.og_image[0].startswith("https://"):
                   errors.append(f"{rel}: missing or invalid og:image")
+              if "image" in spec and parser.og_image and parser.og_image[0] != spec["image"]:
+                  errors.append(f"{rel}: poster URL does not match the visually verified image")
               if len(parser.og_title) != 1 or parser.og_title[0] != title:
                   errors.append(f"{rel}: og:title must match the unique document title")
               if len(parser.descriptions) != 1 or not 100 <= len(description) <= 160:
