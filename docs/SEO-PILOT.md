@@ -27,7 +27,7 @@ The two-connection pages (Interstellar, Alien and The Lord of the Rings) intenti
 - Static `index.html` files under `/peliculas/<slug>/` and `/series/<slug>/`.
 - Unique title and meta description, canonical URL, Open Graph and Twitter metadata.
 - Schema.org `Movie` or `TVSeries` JSON-LD.
-- Responsive layout and poster URLs from the current catalogue; the Star Wars SEO page uses a verified working TMDB poster URL because the registered catalogue URL did not load in the visual check.
+- Responsive layout and poster URLs from the current catalogue, with two documented image corrections: Star Wars uses a verified working TMDB poster URL because its registered URL did not load; One Piece uses verified official Netflix key art because the catalogue image was anime artwork rather than the 2023 live-action series.
 - Catalogue myths, themes and archetypes are rendered exactly as stored.
 - Sitemap contains only the homepage and the ten approved SEO routes.
 - GitHub Actions validation compares each page's myths, themes and archetypes directly with `index.html`, checks exact approved connections, JSON-LD, internal links and sitemap.
@@ -41,3 +41,5 @@ The repository does not provide a public preview deployment for pull requests. T
 ## Catalogue data-quality note
 
 The current catalogue record for `Star Wars` (1977) contains a synopsis referring to the First Order and Rey, which does not match that film's period and title. This pilot uses a corrected editorial synopsis and a verified working TMDB poster URL (`6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg`); the poster URL registered in the catalogue did not load in the visual check. The underlying catalogue record and homepage remain unchanged in this PR and should be corrected separately.
+
+The current catalogue poster for `One Piece` is anime artwork, but this SEO page describes the 2023 live-action series. The page therefore uses official Netflix key art from its Tudum article; the underlying catalogue record and homepage remain unchanged in this PR and should be corrected separately.
