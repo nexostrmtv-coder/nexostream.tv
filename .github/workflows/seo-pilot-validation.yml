@@ -186,6 +186,25 @@ jobs:
                   errors.append(f"{rel}: missing myths/themes/archetypes/connections section")
               if parser.connections != spec["connections"]:
                   errors.append(f"{rel}: approved connections mismatch; expected {spec['connections']}, got {parser.connections}")
+              # Only link a connection when its approved target has a real page in this pilot.
+              # Do not invent URLs for catalogue titles without landing pages.
+              route_by_title = {
+                  page_spec["name"]: "/" + page_path.rsplit("/index.html", 1)[0] + "/"
+                  for page_path, page_spec in expected.items()
+              }
+              connection_blocks = re.findall(
+                  r'<article class="connection" data-title="([^"]+)">(.*?)</article>',
+                  source, re.S
+              )
+              for connection_title, connection_html in connection_blocks:
+                  anchor = re.search(r'<h3>\s*<a href="([^"]+)">', connection_html)
+                  expected_route = route_by_title.get(connection_title)
+                  if expected_route and not anchor:
+                      errors.append(f"{rel}: approved connection '{connection_title}' has a pilot page but no link")
+                  elif anchor and expected_route and anchor.group(1) != expected_route:
+                      errors.append(f"{rel}: connection '{connection_title}' links to {anchor.group(1)} instead of {expected_route}")
+                  elif anchor and not expected_route:
+                      errors.append(f"{rel}: connection '{connection_title}' links to a title with no approved pilot route")
               record = catalog_records.get(spec["name"])
               if record is None:
                   errors.append(f"{rel}: title absent from index.html catalogue")
