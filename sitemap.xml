@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://nexostream.tv/</loc>
-  </url>
+  <url><loc>https://nexostream.tv/</loc></url>
+  <url><loc>https://nexostream.tv/peliculas/star-wars/</loc></url>
+  <url><loc>https://nexostream.tv/peliculas/interstellar/</loc></url>
+  <url><loc>https://nexostream.tv/peliculas/alien/</loc></url>
+  <url><loc>https://nexostream.tv/peliculas/blade-runner/</loc></url>
+  <url><loc>https://nexostream.tv/peliculas/the-matrix/</loc></url>
+  <url><loc>https://nexostream.tv/peliculas/the-lord-of-the-rings/</loc></url>
+  <url><loc>https://nexostream.tv/series/game-of-thrones/</loc></url>
+  <url><loc>https://nexostream.tv/series/stranger-things/</loc></url>
+  <url><loc>https://nexostream.tv/series/one-piece/</loc></url>
+  <url><loc>https://nexostream.tv/series/the-last-of-us/</loc></url>
 </urlset>
