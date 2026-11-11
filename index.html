@@ -411,6 +411,41 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   #reveal-hint.hide{ opacity:0 !important; }
   /* Índice CoNeXión label */
   #left-panel > div:nth-child(3){ color:#ffffff !important; font-size:1.15rem !important; }
+
+  /* SEO internal links: compact, accessible discovery panel */
+  #seo-links{
+    position:fixed;right:28px;bottom:68px;z-index:12;
+    width:min(320px,calc(100vw - 24px));
+    color:#e8e8f0;font-family:'Barlow Condensed',sans-serif;
+  }
+  #seo-links details{
+    background:rgba(3,5,15,.94);border:1px solid rgba(232,200,74,.42);
+    border-radius:4px;box-shadow:0 8px 28px rgba(0,0,0,.35);
+  }
+  #seo-links summary{
+    list-style:none;cursor:pointer;padding:9px 12px;
+    color:#e8c84a;font-family:'Bebas Neue';font-size:1rem;
+    letter-spacing:.12em;text-transform:uppercase;
+  }
+  #seo-links summary::-webkit-details-marker{display:none;}
+  #seo-links summary:after{content:'＋';float:right;font-family:Arial,sans-serif;font-size:.8rem;}
+  #seo-links details[open] summary:after{content:'−';}
+  #seo-links .seo-links-body{padding:0 12px 12px;}
+  #seo-links p{font-size:.76rem;line-height:1.4;color:rgba(255,255,255,.68);margin:0 0 9px;}
+  #seo-links nav{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;}
+  #seo-links a{
+    color:#e8e8f0;text-decoration:none;font-size:.82rem;line-height:1.25;
+    border-bottom:1px solid rgba(232,200,74,.18);padding:3px 0;
+  }
+  #seo-links a:hover,#seo-links a:focus{color:#e8c84a;border-color:#e8c84a;outline:none;}
+  @media(max-width:600px){
+    #seo-links{right:10px;bottom:145px;width:min(290px,calc(100vw - 20px));}
+    #seo-links summary{padding:8px 10px;font-size:.9rem;}
+    #seo-links .seo-links-body{padding:0 10px 10px;}
+    #seo-links nav{gap:5px 10px;}
+    #seo-links a{font-size:.78rem;}
+  }
+
 </style>
 </head>
 <body>
@@ -589,6 +624,29 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </div>
 </div>
+
+
+<!-- SEO discovery links: crawlable internal links to the editorial landing pages -->
+<section id="seo-links" aria-label="Explora las fichas de cine y series de NexoStream">
+  <details>
+    <summary>Explora nuestras conexiones</summary>
+    <div class="seo-links-body">
+      <p>Películas y series que conectan historias, mitos, personajes e influencias.</p>
+      <nav aria-label="Fichas destacadas">
+        <a href="/peliculas/star-wars/">Star Wars</a>
+        <a href="/peliculas/interstellar/">Interstellar</a>
+        <a href="/peliculas/alien/">Alien</a>
+        <a href="/peliculas/blade-runner/">Blade Runner</a>
+        <a href="/peliculas/the-matrix/">The Matrix</a>
+        <a href="/peliculas/the-lord-of-the-rings/">The Lord of the Rings</a>
+        <a href="/series/game-of-thrones/">Game of Thrones</a>
+        <a href="/series/stranger-things/">Stranger Things</a>
+        <a href="/series/one-piece/">One Piece</a>
+        <a href="/series/the-last-of-us/">The Last of Us</a>
+      </nav>
+    </div>
+  </details>
+</section>
 
 <script>
 // ═══════════════════════════════════════════
