@@ -1,6 +1,8 @@
 name: SEO pilot validation
 
 on:
+  push:
+    branches: [feature/mapa-conexiones-blade-runner]
   pull_request:
     branches: [main]
     paths:
