@@ -302,10 +302,10 @@ jobs:
                   print(" - " + path)
               sys.exit(1)
           print(f"GitHub Pages Jekyll build contains all {len(expected)} clean-URL route files.")
+          PY
       - name: Upload static preview artifact
         uses: actions/upload-artifact@v4
         with:
           name: nexostream-blade-runner-preview
           path: ./_site
           retention-days: 7
-          PY
