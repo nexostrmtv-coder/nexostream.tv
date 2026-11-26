@@ -411,6 +411,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   #reveal-hint.hide{ opacity:0 !important; }
   /* Índice CoNeXión label */
   #left-panel > div:nth-child(3){ color:#ffffff !important; font-size:1.15rem !important; }
+
+  /* Desktop: keep the search field below the full NexoStream header */
+  @media (min-width:601px) and (min-height:650px){
+    #left-panel{top:calc(50% + 65px) !important;}
+  }
 </style>
 </head>
 <body>

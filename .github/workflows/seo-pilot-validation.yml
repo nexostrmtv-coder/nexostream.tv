@@ -1,6 +1,8 @@
 name: SEO pilot validation
 
 on:
+  push:
+    branches: [feature/mapa-conexiones-blade-runner]
   pull_request:
     branches: [main]
     paths:
@@ -37,7 +39,7 @@ jobs:
           "peliculas/star-wars/index.html": {"name": "Star Wars", "type": "Movie", "connections": ["The Lord of the Rings","Dune","Harry Potter and the Philosopher Stone"], "image": "https://image.tmdb.org/t/p/w500/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg"},
           "peliculas/interstellar/index.html": {"name": "Interstellar", "type": "Movie", "connections": ["Arrival","Doctor Who"]},
           "peliculas/alien/index.html": {"name": "Alien", "type": "Movie", "connections": ["Jaws","The Thing"]},
-          "peliculas/blade-runner/index.html": {"name": "Blade Runner", "type": "Movie", "connections": ["Dark City","The Matrix","Westworld"]},
+          "peliculas/blade-runner/index.html": {"name": "Blade Runner", "type": "Movie", "connections": ["Alien","The Matrix","Interstellar"]},
           "peliculas/the-matrix/index.html": {"name": "The Matrix", "type": "Movie", "connections": ["Dark City","Tron","Westworld"]},
           "peliculas/the-lord-of-the-rings/index.html": {"name": "The Lord of the Rings", "type": "Movie", "connections": ["Dune","Star Wars"]},
           "series/game-of-thrones/index.html": {"name": "Game of Thrones", "type": "TVSeries", "connections": ["The Lord of the Rings: The Rings of Power","Peaky Blinders","Sons of Anarchy"]},
@@ -184,7 +186,13 @@ jobs:
                   errors.append(f"{rel}: title tag does not contain {spec['name']}")
               if not {"mitos", "temas", "arquetipos", "conexiones"}.issubset(parser.sections):
                   errors.append(f"{rel}: missing myths/themes/archetypes/connections section")
-              if parser.connections != spec["connections"]:
+              if rel == "peliculas/blade-runner/index.html":
+                  map_nodes = re.findall(r'<a class="nexo-node[^"]*" href="([^"]+)"><strong>([^<]+)</strong>', source)
+                  route_by_title = {page_spec["name"]: "/" + page_path.rsplit("/index.html", 1)[0] + "/" for page_path, page_spec in expected.items()}
+                  expected_nodes = [(route_by_title.get(title, "/"), title) for title in spec["connections"]]
+                  if map_nodes != expected_nodes:
+                      errors.append(f"{rel}: visual map nodes mismatch; expected {expected_nodes}, got {map_nodes}")
+              elif parser.connections != spec["connections"]:
                   errors.append(f"{rel}: approved connections mismatch; expected {spec['connections']}, got {parser.connections}")
               # Every connection must link somewhere: use the SEO landing page when
               # one exists in this pilot; otherwise send users to the interactive catalogue.
@@ -297,3 +305,9 @@ jobs:
               sys.exit(1)
           print(f"GitHub Pages Jekyll build contains all {len(expected)} clean-URL route files.")
           PY
+      - name: Upload static preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexostream-blade-runner-preview
+          path: ./_site
+          retention-days: 7
